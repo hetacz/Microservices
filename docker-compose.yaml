@@ -1,0 +1,108 @@
+version: '3.7'
+
+services:
+  currency-exchange:
+    image: hetacz/currency-exchange:0.0.1
+    build:
+      context: ./currency-exchange
+      dockerfile: Dockerfile
+    ports:
+      - '8000:8000'
+    networks:
+      - currency-network
+    depends_on:
+      - naming-server
+    environment:
+      EUREKA.CLIENT.SERVICEURL.DEFAULTZONE: http://naming-server:8761/eureka
+      MANAGEMENT.ZIPKIN.TRACING.ENDPOINT: http://zipkin-server:9411/api/v2/spans
+#    deploy:
+#      resources:
+#        limits:
+#          cpus: '0.2'
+#          memory: 2048M
+#        reservations:
+#          cpus: '0.1'
+#          memory: 1024M
+
+  currency-conversion:
+    image: hetacz/currency-conversion:0.0.1
+    build:
+      context: ./currency-conversion
+      dockerfile: Dockerfile
+    ports:
+      - '8100:8100'
+    networks:
+      - currency-network
+    depends_on:
+      - naming-server
+    environment:
+      EUREKA.CLIENT.SERVICEURL.DEFAULTZONE: http://naming-server:8761/eureka
+      MANAGEMENT.ZIPKIN.TRACING.ENDPOINT: http://zipkin-server:9411/api/v2/spans
+#    deploy:
+#      resources:
+#        limits:
+#          cpus: '0.2'
+#          memory: 2048M
+#        reservations:
+#          cpus: '0.1'
+#          memory: 1024M
+
+  api-gateway:
+    image: hetacz/api-gateway:0.0.1
+    build:
+      context: ./api-gateway
+      dockerfile: Dockerfile
+    ports:
+      - '8765:8765'
+    networks:
+      - currency-network
+    depends_on:
+      - naming-server
+    environment:
+      EUREKA.CLIENT.SERVICEURL.DEFAULTZONE: http://naming-server:8761/eureka
+      MANAGEMENT.ZIPKIN.TRACING.ENDPOINT: http://zipkin-server:9411/api/v2/spans
+#    deploy:
+#      resources:
+#        limits:
+#          cpus: '0.2'
+#          memory: 2048M
+#        reservations:
+#          cpus: '0.1'
+#          memory: 1024M
+
+  naming-server:
+    image: hetacz/naming-server:0.0.1
+    build:
+      context: ./naming-server
+      dockerfile: Dockerfile
+    ports:
+      - '8761:8761'
+    networks:
+      - currency-network
+#    deploy:
+#      resources:
+#        limits:
+#          cpus: '0.2'
+#          memory: 2048M
+#        reservations:
+#          cpus: '0.1'
+#          memory: 1024M
+
+  zipkin-server:
+    image: openzipkin/zipkin
+    ports:
+      - '9411:9411'
+    networks:
+      - currency-network
+    restart: always #Restart if there is a problem starting up
+#    deploy:
+#      resources:
+#        limits:
+#          cpus: '0.2'
+#          memory: 2048M
+#        reservations:
+#          cpus: '0.1'
+#          memory: 1024M
+
+networks:
+    currency-network:

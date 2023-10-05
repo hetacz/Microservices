@@ -1,0 +1,10 @@
+.fastRequest
+.idea
+
+api-gateway/.idea
+config-server/.idea
+currency-conversion/.idea
+currency-exchange/.idea
+git-cfg-repo/.idea
+limits-service/.idea
+naming-server/.idea
